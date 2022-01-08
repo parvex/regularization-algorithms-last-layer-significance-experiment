@@ -150,3 +150,5 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+/src/tb_data/
+/src/log.txt
