@@ -19,18 +19,17 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 benchmark = SplitCIFAR100(n_experiences=5)
 model = make_icarl_net(num_classes=benchmark.n_classes)
 
-
-
 loggers = [
         InteractiveLogger(),
         TextLogger(open('log.txt', 'a')),
         TensorboardLogger(),
         WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name="test-icarl")]
 
-if len(sys.argv) >= 1:
-    wandb.login(key=sys.argv[0])
+if len(sys.argv) > 1:
+    wandb.login(key=sys.argv[1])
 else:
-    print('wandb api key was not specified running without it')
+    print('wandb api key was not specified as arg1, logging manually')
+    wandb.login()
 
 eval_plugin = EvaluationPlugin(
     accuracy_metrics(epoch=True, experience=True, stream=True),
