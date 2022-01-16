@@ -20,11 +20,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 benchmark = SplitCIFAR100(n_experiences=5)
 model = make_icarl_net(num_classes=benchmark.n_classes)
 
-if len(sys.argv) > 1:
-    wandb.login(key=sys.argv[1])
-else:
-    print('wandb api key was not specified as arg1, logging manually')
-
 eval_plugin = EvaluationPlugin(
     accuracy_metrics(epoch=True, experience=True, stream=True),
     loss_metrics(epoch=True, experience=True, stream=True),
