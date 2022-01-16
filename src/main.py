@@ -23,7 +23,6 @@ if len(sys.argv) > 1:
     wandb.login(key=sys.argv[1])
 else:
     print('wandb api key was not specified as arg1, logging manually')
-    wandb.login()
 
 eval_plugin = EvaluationPlugin(
     accuracy_metrics(epoch=True, experience=True, stream=True),
