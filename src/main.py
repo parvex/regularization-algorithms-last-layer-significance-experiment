@@ -2,6 +2,7 @@ import copy
 import sys
 
 import torch
+import uuid
 import wandb
 from avalanche.benchmarks import SplitCIFAR100
 from avalanche.training import JointTraining, Replay, ICaRL
@@ -31,7 +32,7 @@ eval_plugin = EvaluationPlugin(
         InteractiveLogger(),
         TextLogger(open('log.txt', 'a')),
         TensorboardLogger(),
-        WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name="test-icarl")]
+        WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name=f"test-icarl-{uuid.uuid4()}")]
 )
 
 strategy = ICaRL(
