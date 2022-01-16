@@ -1,0 +1,2 @@
+avalanche-lib==0.1.0
+randomname==0.1.5
