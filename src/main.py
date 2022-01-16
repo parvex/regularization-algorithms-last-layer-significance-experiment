@@ -1,4 +1,6 @@
 import copy
+import sys
+
 import torch
 import wandb
 from avalanche.benchmarks import SplitCIFAR100
@@ -16,17 +18,24 @@ from avalanche.training.strategies import EWC
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 benchmark = SplitCIFAR100(n_experiences=5)
 model = make_icarl_net(num_classes=benchmark.n_classes)
-wandb.login(key='1101c4f4f913f15059e7ac2b09a4a3a9e9ff2325')
 
-eval_plugin = EvaluationPlugin(
-    accuracy_metrics(epoch=True, experience=True, stream=True),
-    loss_metrics(epoch=True, experience=True, stream=True),
-    benchmark=benchmark,
-    loggers=[
+
+
+loggers = [
         InteractiveLogger(),
         TextLogger(open('log.txt', 'a')),
         TensorboardLogger(),
         WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name="test-icarl")]
+
+if len(sys.argv) >= 1:
+    wandb.login(key=sys.argv[0])
+else:
+    print('wandb api key was not specified running without it')
+
+eval_plugin = EvaluationPlugin(
+    accuracy_metrics(epoch=True, experience=True, stream=True),
+    loss_metrics(epoch=True, experience=True, stream=True),
+    benchmark=benchmark, loggers=loggers
 )
 
 strategy = ICaRL(
