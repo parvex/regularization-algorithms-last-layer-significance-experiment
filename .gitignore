@@ -153,3 +153,4 @@ fabric.properties
 /src/data/
 /src/tb_data/
 /src/log.txt
+/src/wandb/
