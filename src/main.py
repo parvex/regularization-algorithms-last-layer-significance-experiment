@@ -26,7 +26,7 @@ eval_plugin = EvaluationPlugin(
     benchmark=benchmark, loggers=[
         InteractiveLogger(),
         TextLogger(open('log.txt', 'a')),
-        WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name=f"test-icarl-{randomname.get_name()}")]
+        WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name=f"test-icarl:{randomname.get_name()}")]
 )
 
 strategy = ICaRL(
