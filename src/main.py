@@ -31,7 +31,6 @@ eval_plugin = EvaluationPlugin(
     benchmark=benchmark, loggers=[
         InteractiveLogger(),
         TextLogger(open('log.txt', 'a')),
-        TensorboardLogger(),
         WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name=f"test-icarl-{uuid.uuid4()}")]
 )
 
