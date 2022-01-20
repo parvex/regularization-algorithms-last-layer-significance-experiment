@@ -6,7 +6,7 @@ from avalanche.evaluation.metrics import accuracy_metrics, \
 from avalanche.logging import InteractiveLogger, TextLogger, WandBLogger
 from avalanche.models import make_icarl_net
 from avalanche.training import ICaRL
-from avalanche.training.plugins import EvaluationPlugin
+from avalanche.training.plugins import EvaluationPlugin, LRSchedulerPlugin
 from torch.optim import SGD
 from torch.optim.lr_scheduler import MultiStepLR
 
@@ -30,7 +30,7 @@ strategy = ICaRL(
     model.feature_extractor, model.classifier, optimizer,
     buffer_transform=None, memory_size=2000, fixed_memory=True,
     train_mb_size=128, train_epochs=70, eval_mb_size=128,
-    evaluator=eval_plugin, device=device)
+    evaluator=eval_plugin, device=device, plugins=[LRSchedulerPlugin(scheduler)])
 
 
 # TRAINING LOOP
