@@ -1,24 +1,18 @@
-import copy
-import sys
-
 import randomname
 import torch
-import uuid
 from avalanche.benchmarks import SplitCIFAR100
-from avalanche.training import JointTraining, Replay, ICaRL
-from torch.optim import SGD
-from torch.nn import CrossEntropyLoss
-from avalanche.benchmarks.classic import SplitMNIST
-from avalanche.evaluation.metrics import forgetting_metrics, accuracy_metrics, \
-    loss_metrics, timing_metrics, cpu_usage_metrics, confusion_matrix_metrics, disk_usage_metrics
-from avalanche.models import SimpleMLP, SimpleCNN, make_icarl_net
-from avalanche.logging import InteractiveLogger, TextLogger, TensorboardLogger, WandBLogger
+from avalanche.evaluation.metrics import accuracy_metrics, \
+    loss_metrics
+from avalanche.logging import InteractiveLogger, TextLogger, WandBLogger
+from avalanche.models import make_icarl_net
+from avalanche.training import ICaRL
 from avalanche.training.plugins import EvaluationPlugin
-from avalanche.training.strategies import EWC
+from torch.optim import SGD
+from torch.optim.lr_scheduler import MultiStepLR
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 benchmark = SplitCIFAR100(n_experiences=5)
-model = make_icarl_net(num_classes=benchmark.n_classes)
+model = make_icarl_net(num_classes=benchmark.n_classes, n=5)
 
 eval_plugin = EvaluationPlugin(
     accuracy_metrics(epoch=True, experience=True, stream=True),
@@ -29,10 +23,13 @@ eval_plugin = EvaluationPlugin(
         WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name=f"test-icarl:[{randomname.get_name()}]")]
 )
 
+optimizer = SGD(model.parameters(), lr=2, momentum=0.9)
+scheduler = MultiStepLR(optimizer, milestones=[49, 63])
+
 strategy = ICaRL(
-    model.feature_extractor, model.classifier, SGD(model.parameters(), lr=0.001, momentum=0.9),
-    buffer_transform=None, memory_size=20, fixed_memory=False,
-    train_mb_size=128, train_epochs=60, eval_mb_size=128,
+    model.feature_extractor, model.classifier, optimizer,
+    buffer_transform=None, memory_size=2000, fixed_memory=True,
+    train_mb_size=128, train_epochs=70, eval_mb_size=128,
     evaluator=eval_plugin, device=device)
 
 
