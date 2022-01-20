@@ -10,7 +10,7 @@ from avalanche.training.plugins import EvaluationPlugin, LRSchedulerPlugin
 from torch.optim import SGD
 from torch.optim.lr_scheduler import MultiStepLR
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 benchmark = SplitCIFAR100(n_experiences=5)
 model = make_icarl_net(num_classes=benchmark.n_classes, n=5)
 
