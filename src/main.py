@@ -26,13 +26,15 @@ eval_plugin = EvaluationPlugin(
 )
 
 optimizer = Adam(model.parameters(),lr=0.001)
-scheduler = MultiStepLR(optimizer, milestones=[49, 63])
+# scheduler = MultiStepLR(optimizer, milestones=[49, 63])
 
 strategy = ICaRL(
     model.feature_extractor, model.classifier, optimizer,
     buffer_transform=None, memory_size=2000, fixed_memory=True,
     train_mb_size=128, train_epochs=70, eval_mb_size=128,
-    evaluator=eval_plugin, device=device, plugins=[LRSchedulerPlugin(scheduler)])
+    evaluator=eval_plugin, device=device,
+    # plugins=[LRSchedulerPlugin(scheduler)]
+)
 
 
 # TRAINING LOOP
