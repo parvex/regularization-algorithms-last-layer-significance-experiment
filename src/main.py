@@ -7,7 +7,7 @@ from avalanche.logging import InteractiveLogger, TextLogger, WandBLogger
 from avalanche.models import make_icarl_net
 from avalanche.training import ICaRL
 from avalanche.training.plugins import EvaluationPlugin, LRSchedulerPlugin
-from torch.optim import SGD
+from torch.optim import SGD, Adam
 from torch.optim.lr_scheduler import MultiStepLR
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -25,7 +25,7 @@ eval_plugin = EvaluationPlugin(
         WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name=f"test-icarl:[{randomname.get_name()}]")]
 )
 
-optimizer = SGD(model.parameters(), lr=2, momentum=0.9)
+optimizer = Adam(model.parameters(),lr=0.001)
 scheduler = MultiStepLR(optimizer, milestones=[49, 63])
 
 strategy = ICaRL(
