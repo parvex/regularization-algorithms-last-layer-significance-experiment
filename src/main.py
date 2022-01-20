@@ -25,15 +25,15 @@ eval_plugin = EvaluationPlugin(
         WandBLogger(project_name="reg-alg-cl-last-layer-importance", run_name=f"test-icarl:[{randomname.get_name()}]")]
 )
 
-optimizer = Adam(model.parameters(),lr=0.001)
-# scheduler = MultiStepLR(optimizer, milestones=[49, 63])
+optimizer = SGD(model.parameters(), lr=2, momentum=0.9)
+scheduler = MultiStepLR(optimizer, milestones=[49, 63], gamma=0.2)
 
 strategy = ICaRL(
     model.feature_extractor, model.classifier, optimizer,
     buffer_transform=None, memory_size=2000, fixed_memory=True,
     train_mb_size=128, train_epochs=70, eval_mb_size=128,
     evaluator=eval_plugin, device=device,
-    # plugins=[LRSchedulerPlugin(scheduler)]
+    plugins=[LRSchedulerPlugin(scheduler)]
 )
 
 
