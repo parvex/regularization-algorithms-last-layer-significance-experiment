@@ -55,7 +55,7 @@ class Experiment:
         results = []
 
         if self.args.strategy == 'JOINT':
-            print('JOINT TRAINING ONLY')
+            print('JOINT TRAINING - UPPER BOUND')
             self.strategy.train(self.benchmark.train_stream)
             print('EVAL ON JOINT TRAINING')
             results.append(self.strategy.eval(self.benchmark.test_stream))
