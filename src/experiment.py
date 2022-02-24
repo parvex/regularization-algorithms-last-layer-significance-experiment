@@ -53,6 +53,14 @@ class Experiment:
     def run_experiment(self):
         print('Starting experiment...')
         results = []
+
+        if self.args.strategy == 'JOINT':
+            print('JOINT TRAINING ONLY')
+            self.strategy.train(self.benchmark.train_stream)
+            print('EVAL ON JOINT TRAINING')
+            results.append(self.strategy.eval(self.benchmark.test_stream))
+            return
+
         for experience in self.benchmark.train_stream:
             print("Start of experience: ", experience.current_experience)
             print("Current Classes: ", experience.classes_in_this_experience)
