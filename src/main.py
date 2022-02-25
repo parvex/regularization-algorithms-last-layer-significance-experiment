@@ -10,7 +10,7 @@ def parse_parameters():
                                                  'class learning strategy.')
     parser.add_argument('--dataset', choices=['CIFAR100', 'MNIST', 'CUB200'], nargs='?', default='CIFAR100',
                         help='dataset on which strategy will be used')
-    parser.add_argument('--epochs', type=int, help='number of epochs', default=80)
+    parser.add_argument('--epochs', type=int, help='number of epochs', default=70)
     parser.add_argument('--experiences', type=int, help='number of even class splits', default=5)
     parser.add_argument('--learning_rate', type=float, help='learning rate of Adam optimizer', default=0.001)
     parser.add_argument('--batch_size', type=int,
