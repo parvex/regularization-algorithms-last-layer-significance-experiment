@@ -1,4 +1,4 @@
-# regularization-algorithms-last-layer-test
+# regularization-algorithms-last-layer-significance-experiment
 
 Project works on Linux os.
 
