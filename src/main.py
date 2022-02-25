@@ -26,7 +26,7 @@ def parse_parameters():
                              'the larger the regularization',
                         default=0.1)
 
-    parser_ewc.add_argument('--ewc_mode', choices=['separate, onlinesum'], nargs='?', default='separate',
+    parser_ewc.add_argument('--ewc_mode', choices=['separate', 'onlinesum'], nargs='?', default='separate',
                         help='separate to keep a separate penalty for each previous experience. onlinesum to keep a '
                              'single penalty summed over all previous tasks. onlineweightedsum to keep a single '
                              'penalty summed with a decay factor over all previous tasks')
