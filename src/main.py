@@ -15,6 +15,8 @@ def parse_parameters():
     parser.add_argument('--learning_rate', type=float, help='learning rate of Adam optimizer', default=0.001)
     parser.add_argument('--batch_size', type=int,
                         help='the train minibatch size', default=32)
+    parser.add_argument('--cpu',  action='store_true',
+                        help='If CPU should be used instead of CUDA')
 
     subparsers = parser.add_subparsers(help='specific continual learning algorithm type', dest='strategy',
                                        required=True, metavar='algorithm')

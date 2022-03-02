@@ -1,4 +1,5 @@
 import copy
+import os
 
 import randomname
 import torch
@@ -24,12 +25,13 @@ class Experiment:
     plugins = None
 
     def __init__(self, args):
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
+        print('device: ' + str(device))
 
         self.args = args
         self.benchmark = self.get_benchmark(args)
         self.model = make_icarl_net(num_classes=self.benchmark.n_classes, n=args.experiences)
-
+        self.model.to(device)
         self.eval_plugin = EvaluationPlugin(
             accuracy_metrics(epoch=True, experience=True, stream=True),
             loss_metrics(epoch=True, experience=True, stream=True),
