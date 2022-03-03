@@ -25,8 +25,8 @@ class Experiment:
     plugins = None
 
     def __init__(self, args):
-        device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
-        print('device: ' + str(device))
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
+        print('device: ' + str(self.device))
 
         self.args = args
         self.benchmark = self.get_benchmark(args)
