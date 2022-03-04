@@ -10,7 +10,8 @@ def parse_parameters():
                                                  'class learning strategy.')
     parser.add_argument('--dataset', choices=['CIFAR100', 'MNIST', 'CUB200'], nargs='?', default='CIFAR100',
                         help='dataset on which strategy will be used')
-    parser.add_argument('--epochs', type=int, help='number of epochs', default=70)
+    parser.add_argument('--epochs', type=int, help='number of epochs for training using main algorithm', default=70)
+    parser.add_argument('--last_layer_epochs', type=int, help='number of epochs for finetuning last layer', default=20)
     parser.add_argument('--experiences', type=int, help='number of even class splits', default=5)
     parser.add_argument('--learning_rate', type=float, help='learning rate of Adam optimizer', default=0.001)
     parser.add_argument('--batch_size', type=int,
@@ -30,7 +31,7 @@ def parse_parameters():
     parser_ewc.add_argument('--ewc_lambda', type=float,
                         help='EWC hyperparameter to weigh the penalty inside the total loss. The larger the lambda, '
                              'the larger the regularization',
-                        default=0.1)
+                        default=2)
 
     parser_ewc.add_argument('--ewc_mode', choices=['separate', 'onlinesum'], nargs='?', default='separate',
                         help='separate to keep a separate penalty for each previous experience. onlinesum to keep a '
@@ -50,8 +51,8 @@ def parse_parameters():
     parser_lwf.add_argument('--lwf_alpha', type=float,
                         help='LwF distillation hyperparameter. It can be either a float number or a list containing '
                              'alpha for each experience.',
-                        default=0.2)
-    parser_lwf.add_argument('--lwf_temperature', type=float, help='LwF softmax temperature for distillation', default=3)
+                        default=1)
+    parser_lwf.add_argument('--lwf_temperature', type=float, help='LwF softmax temperature for distillation', default=2)
 
     # SI
     parser_si = subparsers.add_parser('SI', help='Synaptic Intelligence')
@@ -59,9 +60,9 @@ def parse_parameters():
     parser_si.add_argument('--si_lambda', type=float,
                         help='Synaptic Intelligence lambda term. If list, one lambda for each experience. If the list '
                              'has less elements than the number of experiences, last lambda will be used for the '
-                             'remaining experiences', default=3)
+                             'remaining experiences', default=0.1)
     parser_si.add_argument('--si_eps', type=float,
-                        help='Synaptic Intelligence damping parameter.', default=1e-07)
+                        help='Synaptic Intelligence damping parameter.', default=1e-03)
 
 
     # ICARL

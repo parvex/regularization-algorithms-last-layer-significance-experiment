@@ -30,7 +30,8 @@ class Experiment:
 
         self.args = args
         self.benchmark = self.get_benchmark(args)
-        self.model = make_icarl_net(num_classes=self.benchmark.n_classes, n=5)
+        n_channels = 1 if args.dataset == 'MNIST' else 3
+        self.model = make_icarl_net(num_classes=self.benchmark.n_classes, n=5, c=n_channels)
 
         self.eval_plugin = EvaluationPlugin(
             accuracy_metrics(epoch=True, experience=True, stream=True),
@@ -75,11 +76,11 @@ class Experiment:
             # test also returns a dictionary which contains all the metric values
             results.append(self.strategy.eval(self.benchmark.test_stream))
 
-        freeze_model = copy.deepcopy(self.model)
-        freeze_model.features.requires_grad_(False)
+        frozen_model = copy.deepcopy(self.model)
+        frozen_model.feature_extractor.requires_grad_(False)
         strategy = JointTraining(self.model, self.optimizer, CrossEntropyLoss(),
                                  train_mb_size=self.args.batch_size, eval_mb_size=self.args.batch_size,
-                                 train_epochs=self.args.epochs, evaluator=self.eval_plugin, device=self.device,
+                                 train_epochs=self.args.last_layer_epochs, evaluator=self.eval_plugin, device=self.device,
                                  plugins=self.plugins)
 
         print('JOINT TRAINING ONLY ON LAST LAYER')
