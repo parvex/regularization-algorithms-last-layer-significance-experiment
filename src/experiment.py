@@ -7,7 +7,7 @@ from avalanche.benchmarks import SplitCIFAR100, SplitMNIST, SplitCUB200
 from avalanche.evaluation.metrics import accuracy_metrics, loss_metrics
 from avalanche.logging import InteractiveLogger, TextLogger, WandBLogger
 from avalanche.models import make_icarl_net
-from avalanche.training import EWC, LwF, SynapticIntelligence, JointTraining
+from avalanche.training import EWC, LwF, SynapticIntelligence, JointTraining, ICaRL, Naive
 from avalanche.training.plugins import EvaluationPlugin
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
@@ -30,7 +30,7 @@ class Experiment:
 
         self.args = args
         self.benchmark = self.get_benchmark(args)
-        self.model = make_icarl_net(num_classes=self.benchmark.n_classes, n=args.experiences)
+        self.model = make_icarl_net(num_classes=self.benchmark.n_classes, n=5)
 
         self.eval_plugin = EvaluationPlugin(
             accuracy_metrics(epoch=True, experience=True, stream=True),
@@ -97,7 +97,17 @@ class Experiment:
             return SplitCUB200(n_experiences=args.experiences)
 
     def get_strategy(self, args):
-        if args.strategy == 'EWC':
+        if args.strategy == 'JOINT':
+            return JointTraining(self.model, self.optimizer, CrossEntropyLoss(),
+                                 train_mb_size=args.batch_size, eval_mb_size=args.batch_size,
+                                 train_epochs=args.epochs, evaluator=self.eval_plugin, device=self.device,
+                                 plugins=self.plugins)
+        if args.strategy == 'NAIVE':
+            return Naive(self.model, self.optimizer, CrossEntropyLoss(),
+                         train_mb_size=args.batch_size, eval_mb_size=args.batch_size,
+                         train_epochs=args.epochs, evaluator=self.eval_plugin, device=self.device,
+                         plugins=self.plugins)
+        elif args.strategy == 'EWC':
             return EWC(self.model, self.optimizer, CrossEntropyLoss(),
                        train_mb_size=args.batch_size, eval_mb_size=args.batch_size,
                        train_epochs=args.epochs, evaluator=self.eval_plugin, device=self.device, plugins=self.plugins,
@@ -114,8 +124,9 @@ class Experiment:
                                         train_epochs=args.epochs, evaluator=self.eval_plugin, device=self.device,
                                         plugins=self.plugins,
                                         si_lambda=args.si_lambda, eps=args.si_eps)
-        elif args.strategy == 'JOINT':
-            return JointTraining(self.model, self.optimizer, CrossEntropyLoss(),
-                                 train_mb_size=args.batch_size, eval_mb_size=args.batch_size,
-                                 train_epochs=args.epochs, evaluator=self.eval_plugin, device=self.device,
-                                 plugins=self.plugins)
+        elif args.strategy == 'ICARL':
+            return ICaRL(self.model.feature_extractor, self.model.classifier, self.optimizer,
+                         train_mb_size=args.batch_size, eval_mb_size=args.batch_size,
+                         train_epochs=args.epochs, evaluator=self.eval_plugin, device=self.device,
+                         plugins=self.plugins,
+                         memory_size=args.icarl_memory_size, fixed_memory=True, buffer_transform=None)

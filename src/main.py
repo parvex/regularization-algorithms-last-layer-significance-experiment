@@ -14,12 +14,16 @@ def parse_parameters():
     parser.add_argument('--experiences', type=int, help='number of even class splits', default=5)
     parser.add_argument('--learning_rate', type=float, help='learning rate of Adam optimizer', default=0.001)
     parser.add_argument('--batch_size', type=int,
-                        help='the train minibatch size', default=32)
+                        help='the train minibatch size', default=128)
     parser.add_argument('--cpu',  action='store_true',
                         help='If CPU should be used instead of CUDA')
 
     subparsers = parser.add_subparsers(help='specific continual learning algorithm type', dest='strategy',
                                        required=True, metavar='algorithm')
+
+
+    # JOINT
+    parser_joint = subparsers.add_parser('JOINT', help='Joint training')
 
     # EWC
     parser_ewc = subparsers.add_parser('EWC', help='Elastic Weight Consolidation')
@@ -59,8 +63,17 @@ def parse_parameters():
     parser_si.add_argument('--si_eps', type=float,
                         help='Synaptic Intelligence damping parameter.', default=1e-07)
 
-    # JOINT
-    parser_ewc = subparsers.add_parser('JOINT', help='Joint training')
+
+    # ICARL
+    parser_icarl = subparsers.add_parser('ICARL', help='Incremental Classifier and Representation Learning')
+
+    parser_icarl.add_argument('--icarl_memory_size', type=int,
+                        help='The nuber of patterns saved in the memory', default=2000)
+
+    # NAIVE
+    parser_naive = subparsers.add_parser('NAIVE', help='Naive finetuning')
+
+
 
 
     parser.print_help()
