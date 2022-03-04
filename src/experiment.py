@@ -40,7 +40,7 @@ class Experiment:
                 InteractiveLogger(),
                 TextLogger(open('log.txt', 'a')),
                 WandBLogger(project_name="reg-alg-cl-last-layer-importance",
-                            run_name=f"LastLayerExp[{args.dataset}, {args.strategy}-{randomname.get_name()}]")]
+                            run_name=f"MsTh[{args.dataset}, {args.strategy}-{randomname.get_name()}]")]
         )
 
         self.optimizer = Adam(self.model.parameters(), lr=args.learning_rate)
