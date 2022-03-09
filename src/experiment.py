@@ -11,6 +11,7 @@ from avalanche.training import EWC, LwF, SynapticIntelligence, JointTraining, IC
 from avalanche.training.plugins import EvaluationPlugin
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
+from src.logger import Logger
 
 
 class Experiment:
@@ -25,8 +26,13 @@ class Experiment:
     plugins = None
 
     def __init__(self, args):
+        run_name = f'Mgr-{args.dataset}, {args.strategy}-{randomname.get_name()}'
+        os.makedirs('./../logs', exist_ok=True)
+        log_file = f"./../logs/{run_name}.log"
+        self.logger = Logger(log_file)
+
         self.device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
-        print('device: ' + str(self.device))
+        self.logger.log('device: ' + str(self.device))
 
         self.args = args
         self.benchmark = self.get_benchmark(args)
@@ -38,9 +44,9 @@ class Experiment:
             loss_metrics(epoch=True, experience=True, stream=True),
             benchmark=self.benchmark, loggers=[
                 InteractiveLogger(),
-                TextLogger(open('log.txt', 'a')),
+                TextLogger(open(log_file, 'a')),
                 WandBLogger(project_name="reg-alg-cl-last-layer-importance",
-                            run_name=f"Mgr[{args.dataset}, {args.strategy}-{randomname.get_name()}]")]
+                            run_name=run_name)]
         )
 
         self.optimizer = Adam(self.model.parameters(), lr=args.learning_rate)
@@ -54,25 +60,25 @@ class Experiment:
 
     # TRAINING LOOP
     def run_experiment(self):
-        print('Starting experiment...')
+        self.logger.log('Starting experiment...')
         results = []
 
         if self.args.strategy == 'JOINT':
-            print('JOINT TRAINING - UPPER BOUND')
+            self.logger.log('JOINT TRAINING - UPPER BOUND')
             self.strategy.train(self.benchmark.train_stream)
-            print('EVAL ON JOINT TRAINING')
+            self.logger.log('EVAL ON JOINT TRAINING')
             results.append(self.strategy.eval(self.benchmark.test_stream))
             return
 
         for experience in self.benchmark.train_stream:
-            print("Start of experience: ", experience.current_experience)
-            print("Current Classes: ", experience.classes_in_this_experience)
+            self.logger.log(f"Start of experience: {experience.current_experience}")
+            self.logger.log(f"Current Classes: {experience.classes_in_this_experience}")
 
             # train returns a dictionary which contains all the metric values
             res = self.strategy.train(experience)
-            print('Training completed')
+            self.logger.log('Training completed')
 
-            print('Computing accuracy on the whole test set')
+            self.logger.log('Computing accuracy on the whole test set')
             # test also returns a dictionary which contains all the metric values
             results.append(self.strategy.eval(self.benchmark.test_stream))
 
@@ -83,10 +89,10 @@ class Experiment:
                                  train_epochs=self.args.last_layer_epochs, evaluator=self.eval_plugin, device=self.device,
                                  plugins=self.plugins)
 
-        print('JOINT TRAINING ONLY ON LAST LAYER')
+        self.logger.log('JOINT TRAINING ONLY ON LAST LAYER')
         strategy.train(self.benchmark.train_stream)
 
-        print('EVAL ON JOINT TRAINING ONLY ON LAST LAYER')
+        self.logger.log('EVAL ON JOINT TRAINING ONLY ON LAST LAYER')
         results.append(strategy.eval(self.benchmark.test_stream))
 
     def get_benchmark(self, args):
