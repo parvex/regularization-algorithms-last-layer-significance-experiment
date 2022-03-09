@@ -11,7 +11,17 @@ from avalanche.training import EWC, LwF, SynapticIntelligence, JointTraining, IC
 from avalanche.training.plugins import EvaluationPlugin
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
-from src.logger import Logger
+import logging
+
+
+class Logger:
+    def __init__(self, log_file):
+        self.log_file = log_file
+        logging.basicConfig(filename=log_file, level=logging.INFO)
+
+    def log(self, message):
+        print(message)
+        logging.info(message)
 
 
 class Experiment:
@@ -27,8 +37,8 @@ class Experiment:
 
     def __init__(self, args):
         run_name = f'Mgr-{args.dataset}, {args.strategy}-{randomname.get_name()}'
-        os.makedirs('./../logs', exist_ok=True)
-        log_file = f"./../logs/{run_name}.log"
+        os.makedirs('./logs', exist_ok=True)
+        log_file = f"./logs/{run_name}.log"
         self.logger = Logger(log_file)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
@@ -86,7 +96,8 @@ class Experiment:
         frozen_model.feature_extractor.requires_grad_(False)
         strategy = JointTraining(self.model, self.optimizer, CrossEntropyLoss(),
                                  train_mb_size=self.args.batch_size, eval_mb_size=self.args.batch_size,
-                                 train_epochs=self.args.last_layer_epochs, evaluator=self.eval_plugin, device=self.device,
+                                 train_epochs=self.args.last_layer_epochs, evaluator=self.eval_plugin,
+                                 device=self.device,
                                  plugins=self.plugins)
 
         self.logger.log('JOINT TRAINING ONLY ON LAST LAYER')
