@@ -81,7 +81,7 @@ class Experiment:
 
         frozen_model = copy.deepcopy(self.model)
         frozen_model.feature_extractor.requires_grad_(False)
-        strategy = JointTraining(self.model, self.optimizer, CrossEntropyLoss(),
+        strategy = JointTraining(frozen_model, self.optimizer, CrossEntropyLoss(),
                                  train_mb_size=self.args.batch_size, eval_mb_size=self.args.batch_size,
                                  train_epochs=self.args.last_layer_epochs, evaluator=self.eval_plugin,
                                  device=self.device,
