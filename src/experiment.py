@@ -1,7 +1,6 @@
 import copy
 import os
-
-import randomname
+from datetime import datetime
 import torch
 from avalanche.benchmarks import SplitCIFAR100, SplitMNIST, SplitCUB200
 from avalanche.evaluation.metrics import accuracy_metrics, loss_metrics
@@ -11,17 +10,7 @@ from avalanche.training import EWC, LwF, SynapticIntelligence, JointTraining, IC
 from avalanche.training.plugins import EvaluationPlugin
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
-import logging
-
-
-class Logger:
-    def __init__(self, log_file):
-        self.log_file = log_file
-        logging.basicConfig(filename=log_file, level=logging.INFO)
-
-    def log(self, message):
-        print(message)
-        logging.info(message)
+from logger import create_logger
 
 
 class Experiment:
@@ -36,13 +25,11 @@ class Experiment:
     plugins = None
 
     def __init__(self, args):
-        run_name = f'Mgr-{args.dataset}, {args.strategy}-{randomname.get_name()}'
-        os.makedirs('./logs', exist_ok=True)
-        log_file = f"./logs/{run_name}.log"
-        self.logger = Logger(log_file)
+        run_name = f'Mgr-{args.dataset}, {args.strategy}-{datetime.now()}'
+        self.logger = create_logger(run_name)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
-        self.logger.log('device: ' + str(self.device))
+        self.logger.info('device: ' + str(self.device))
 
         self.args = args
         self.benchmark = self.get_benchmark(args)
@@ -70,25 +57,25 @@ class Experiment:
 
     # TRAINING LOOP
     def run_experiment(self):
-        self.logger.log('Starting experiment...')
+        self.logger.info('Starting experiment...')
         results = []
 
         if self.args.strategy == 'JOINT':
-            self.logger.log('JOINT TRAINING - UPPER BOUND')
+            self.logger.info('JOINT TRAINING - UPPER BOUND')
             self.strategy.train(self.benchmark.train_stream)
-            self.logger.log('EVAL ON JOINT TRAINING')
+            self.logger.info('EVAL ON JOINT TRAINING')
             results.append(self.strategy.eval(self.benchmark.test_stream))
             return
 
         for experience in self.benchmark.train_stream:
-            self.logger.log(f"Start of experience: {experience.current_experience}")
-            self.logger.log(f"Current Classes: {experience.classes_in_this_experience}")
+            self.logger.info(f"Start of experience: {experience.current_experience}")
+            self.logger.info(f"Current Classes: {experience.classes_in_this_experience}")
 
             # train returns a dictionary which contains all the metric values
             res = self.strategy.train(experience)
-            self.logger.log('Training completed')
+            self.logger.info('Training completed')
 
-            self.logger.log('Computing accuracy on the whole test set')
+            self.logger.info('Computing accuracy on the whole test set')
             # test also returns a dictionary which contains all the metric values
             results.append(self.strategy.eval(self.benchmark.test_stream))
 
@@ -100,11 +87,22 @@ class Experiment:
                                  device=self.device,
                                  plugins=self.plugins)
 
-        self.logger.log('JOINT TRAINING ONLY ON LAST LAYER')
+        self.logger.info('JOINT TRAINING ONLY ON LAST LAYER')
         strategy.train(self.benchmark.train_stream)
 
-        self.logger.log('EVAL ON JOINT TRAINING ONLY ON LAST LAYER')
+        self.logger.info('EVAL ON JOINT TRAINING ONLY ON LAST LAYER')
         results.append(strategy.eval(self.benchmark.test_stream))
+
+        if self.check_if_feature_extractor_is_unchanged(self.model, frozen_model):
+            self.logger.info('Feature extractors are unchanged in base model and frozen one')
+        else:
+            self.logger.error('!!!Feature extractors are not same in base model and frozen one!!!')
+
+    def check_if_feature_extractor_is_unchanged(self, frozen_model):
+        for p1, p2 in zip(self.model.feature_extractor.parameters(), frozen_model.feature_extractor.parameters()):
+            if p1.data.ne(p2.data).sum() > 0:
+                return False
+        return True
 
     def get_benchmark(self, args):
         if args.dataset == 'CIFAR100':
