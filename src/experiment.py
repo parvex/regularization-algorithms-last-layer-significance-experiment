@@ -26,7 +26,7 @@ class Experiment:
 
     def __init__(self, args):
         run_name = f'Mgr-{args.dataset}, {args.strategy}-{datetime.now()}'
-        log_file = '../logs/' + run_name + '.log'
+        log_file = './logs/' + run_name + '.log'
         self.logger = create_logger(log_file)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
