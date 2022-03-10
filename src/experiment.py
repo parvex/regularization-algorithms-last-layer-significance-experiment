@@ -26,7 +26,8 @@ class Experiment:
 
     def __init__(self, args):
         run_name = f'Mgr-{args.dataset}, {args.strategy}-{datetime.now()}'
-        self.logger = create_logger(run_name)
+        log_file = '../logs/' + run_name + '.log'
+        self.logger = create_logger(log_file)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() and not args.cpu else "cpu")
         self.logger.info('device: ' + str(self.device))
@@ -93,8 +94,9 @@ class Experiment:
         self.logger.info('EVAL ON JOINT TRAINING ONLY ON LAST LAYER')
         results.append(strategy.eval(self.benchmark.test_stream))
 
-        if self.check_if_feature_extractor_is_unchanged(self.model, frozen_model):
+        if self.check_if_feature_extractor_is_unchanged(frozen_model):
             self.logger.info('Feature extractors are unchanged in base model and frozen one')
+            self.logger.info('Experiment completed')
         else:
             self.logger.error('!!!Feature extractors are not same in base model and frozen one!!!')
 
