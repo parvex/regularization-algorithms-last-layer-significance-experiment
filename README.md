@@ -6,7 +6,7 @@ Project works on Linux os.
 
 ## How to run:
 
-1. Install Avalanche `pip install avalanche-lib`
+1. Install requirements `pip install -r requirements.txt`
 2. Run `./run-experiments.sh` or start specific experiment manually:
 
 usage: main.py [-h] [--dataset [{CIFAR100,MNIST,CUB200}]] [--epochs EPOCHS] [--experiences EXPERIENCES] [--learning_rate LEARNING_RATE] [--batch_size BATCH_SIZE] algorithm ...
