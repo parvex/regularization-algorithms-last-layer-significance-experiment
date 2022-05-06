@@ -6,7 +6,7 @@ from experiment import Experiment
 def parse_parameters():
     parser = argparse.ArgumentParser(description='This program is used to start one of the prepared experiments'
                                                  'concerning studying the importance of last layer of neural network'
-                                                 'in the catastrophic forgetting during regularization based continual'
+                                                 ' in the catastrophic forgetting during regularization based continual'
                                                  'class learning strategy.')
     parser.add_argument('--dataset', choices=['CIFAR100', 'MNIST', 'CUB200'], nargs='?', default='CIFAR100',
                         help='dataset on which strategy will be used')
