@@ -9,6 +9,8 @@ Project works on Linux os.
 1. Install requirements `pip install -r requirements.txt`
 2. Run `./run-experiments.sh` or start specific experiment manually:
 
+usage: main.py [-h] [--dataset [{CIFAR100,MNIST,CUB200}]] [--epochs EPOCHS] [--last_layer_epochs LAST_LAYER_EPOCHS] [--experiences EXPERIENCES] [--learning_rate LEARNING_RATE] [--batch_size BATCH_SIZE] [--cpu] algorithm ...
+
 This program is used to start one of the prepared experimentsconcerning studying the importance of last layer of neural networkin the catastrophic forgetting during regularization based continualclass learning strategy.
 
 positional arguments:
