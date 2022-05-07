@@ -6,28 +6,33 @@ Project works on Linux os.
 
 ## How to run:
 
-1. Install Avalanche `pip install avalanche-lib`
+1. Install requirements `pip install -r requirements.txt`
 2. Run `./run-experiments.sh` or start specific experiment manually:
 
-usage: main.py [-h] [--dataset [{CIFAR100,MNIST,CUB200}]] [--epochs EPOCHS] [--experiences EXPERIENCES] [--learning_rate LEARNING_RATE] [--batch_size BATCH_SIZE] algorithm ...
+usage: main.py [-h] [--dataset [{CIFAR100,MNIST,CUB200}]] [--epochs EPOCHS] [--last_layer_epochs LAST_LAYER_EPOCHS] [--experiences EXPERIENCES] [--learning_rate LEARNING_RATE] [--batch_size BATCH_SIZE] [--cpu] algorithm ...
+
+This program is used to start one of the prepared experimentsconcerning studying the importance of last layer of neural network in the catastrophic forgetting during regularization based continualclass learning strategy.
 
 positional arguments:
   algorithm             specific continual learning algorithm type
+    JOINT               Joint training
     EWC                 Elastic Weight Consolidation
     LWF                 Learning without Forgetting
     SI                  Synaptic Intelligence
-    JOINT               Joint training
+    ICARL               Incremental Classifier and Representation Learning
+    NAIVE               Naive finetuning
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --dataset [{CIFAR100,MNIST,CUB200}]
                         dataset on which strategy will be used
-  --epochs EPOCHS       number of epochs
+  --epochs EPOCHS       number of epochs for training using main algorithm
+  --last_layer_epochs LAST_LAYER_EPOCHS
+                        number of epochs for finetuning last layer
   --experiences EXPERIENCES
                         number of even class splits
   --learning_rate LEARNING_RATE
                         learning rate of Adam optimizer
   --batch_size BATCH_SIZE
                         the train minibatch size
-usage: main.py [-h] [--dataset [{CIFAR100,MNIST,CUB200}]] [--epochs EPOCHS] [--experiences EXPERIENCES] [--learning_rate LEARNING_RATE] [--batch_size BATCH_SIZE] algorithm ...
-
+  --cpu                 If CPU should be used instead of CUDA
