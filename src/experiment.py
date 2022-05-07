@@ -3,9 +3,10 @@ import os
 from datetime import datetime
 import torch
 from avalanche.benchmarks import SplitCIFAR100, SplitMNIST, SplitCUB200
-from avalanche.evaluation.metrics import accuracy_metrics, loss_metrics
+from avalanche.evaluation.metrics import accuracy_metrics, loss_metrics, forgetting_metrics, timing_metrics, \
+    confusion_matrix_metrics, TrainedExperienceAccuracy, forward_transfer_metrics, bwt_metrics
 from avalanche.logging import InteractiveLogger, TextLogger, WandBLogger
-from avalanche.models import make_icarl_net
+from avalanche.models import make_icarl_net, initialize_icarl_net
 from avalanche.training import EWC, LwF, SynapticIntelligence, JointTraining, ICaRL, Naive
 from avalanche.training.plugins import EvaluationPlugin
 from torch.nn import CrossEntropyLoss
@@ -36,10 +37,14 @@ class Experiment:
         self.benchmark = self.get_benchmark(args)
         n_channels = 1 if args.dataset == 'MNIST' else 3
         self.model = make_icarl_net(num_classes=self.benchmark.n_classes, n=5, c=n_channels)
+        self.model.apply(initialize_icarl_net)
 
         self.eval_plugin = EvaluationPlugin(
-            accuracy_metrics(epoch=True, experience=True, stream=True),
+            accuracy_metrics(epoch=True, experience=True, stream=True, trained_experience=True),
             loss_metrics(epoch=True, experience=True, stream=True),
+            forgetting_metrics(experience=True, stream=True),
+            timing_metrics(epoch=True),
+            confusion_matrix_metrics(num_classes=self.benchmark.n_classes, save_image=True, stream=True, wandb=True),
             benchmark=self.benchmark, loggers=[
                 InteractiveLogger(),
                 TextLogger(open(log_file, 'a')),
