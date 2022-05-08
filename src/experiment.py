@@ -1,10 +1,9 @@
 import copy
-import os
 from datetime import datetime
 import torch
 from avalanche.benchmarks import SplitCIFAR100, SplitMNIST, SplitCUB200
 from avalanche.evaluation.metrics import accuracy_metrics, loss_metrics, forgetting_metrics, timing_metrics, \
-    confusion_matrix_metrics, TrainedExperienceAccuracy, forward_transfer_metrics, bwt_metrics
+    confusion_matrix_metrics
 from avalanche.logging import InteractiveLogger, TextLogger, WandBLogger
 from avalanche.models import make_icarl_net, initialize_icarl_net
 from avalanche.training import EWC, LwF, SynapticIntelligence, JointTraining, ICaRL, Naive
@@ -53,12 +52,10 @@ class Experiment:
         )
 
         self.optimizer = Adam(self.model.parameters(), lr=args.learning_rate)
-
         # todo if needed
         self.scheduler = None
         # todo if needed
         self.plugins = None
-
         self.strategy = self.get_strategy(args)
 
     # TRAINING LOOP
