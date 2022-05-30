@@ -112,7 +112,7 @@ class Experiment:
         if args.dataset == 'CIFAR100':
             return SplitCIFAR100(n_experiences=args.experiences, seed=8754)
         elif args.dataset == 'MNIST':
-            return SplitMNIST(n_experiences=args.experiences, seed=8754)
+            return SplitMNIST(n_experiences=args.experiences, seed=8561)
         elif args.dataset == 'CUB200':
             return SplitCUB200(n_experiences=args.experiences, seed=8754)
 
