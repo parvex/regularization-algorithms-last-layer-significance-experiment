@@ -110,11 +110,11 @@ class Experiment:
 
     def get_benchmark(self, args):
         if args.dataset == 'CIFAR100':
-            return SplitCIFAR100(n_experiences=args.experiences)
+            return SplitCIFAR100(n_experiences=args.experiences, seed=8754)
         elif args.dataset == 'MNIST':
-            return SplitMNIST(n_experiences=args.experiences)
+            return SplitMNIST(n_experiences=args.experiences, seed=8754)
         elif args.dataset == 'CUB200':
-            return SplitCUB200(n_experiences=args.experiences)
+            return SplitCUB200(n_experiences=args.experiences, seed=8754)
 
     def get_strategy(self, args):
         if args.strategy == 'JOINT':
